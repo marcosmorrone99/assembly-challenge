@@ -64,7 +64,7 @@ export function PhotoModal({ photoId, onClose }: Props) {
                 rel="noopener noreferrer"
                 className="text-sm text-blue-600 underline mt-1 inline-block"
               >
-                See it on Pexels
+                Pexels
               </a>
             </div>
           </div>

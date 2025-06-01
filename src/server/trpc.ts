@@ -1,5 +1,3 @@
-//setup base de tRPC (server). Inicializa tRPC del lado del servidor
-
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 

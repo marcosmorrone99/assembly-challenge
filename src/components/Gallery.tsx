@@ -1,79 +1,68 @@
 "use client";
 
-import { trpc } from "@/utils/trpc";
-import type { PexelsPhoto } from "@/server/routers/pexels";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { PhotoModal } from "./PhotoModal";
-import Image from "next/image";
+import { GalleryHeader } from "./GalleryHeader";
+import { PhotoCard } from "./PhotoCard";
+import { usePhotosQuery } from "@/hooks/usePhotosQuery";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import type { PexelsPhoto } from "@/server/routers/pexels";
 import { ReloadIcon } from "@radix-ui/react-icons";
 
+const PER_PAGE = 20;
+
 export function Gallery() {
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState("");
   const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    trpc.pexels.getPhotosPaginated.useInfiniteQuery(
-      { perPage: 20 },
-      {
-        getNextPageParam: (lastPage: { nextCursor: number | undefined }) =>
-          lastPage.nextCursor,
-      }
-    );
+    usePhotosQuery(searchQuery, PER_PAGE);
 
-  const loaderRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1 }
-    );
-
-    const current = loaderRef.current;
-    if (current) observer.observe(current);
-
-    return () => {
-      if (current) observer.unobserve(current);
-    };
-  }, [fetchNextPage, hasNextPage]);
-
-  if (status === "loading") {
-    return (
-      <div className="flex justify-center items-center mt-10">
-        <ReloadIcon className="h-6 w-6 animate-spin text-gray-500" />
-      </div>
-    );
-  }
-
-  if (status === "error") {
-    return (
-      <p className="text-red-500 text-center mt-10">Error cargando fotos</p>
-    );
-  }
+  const loaderRef = useInfiniteScroll(fetchNextPage, !!hasNextPage);
 
   const allPhotos = data?.pages.flatMap((page) => page.photos) || [];
 
   return (
     <>
+      <GalleryHeader
+        value={searchInput}
+        onChange={setSearchInput}
+        onSearch={setSearchQuery}
+        searchQuery={searchQuery}
+        onClearSearch={() => {
+          setSearchQuery(null);
+          setSearchInput("");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
+      {status === "loading" && (
+        <div className="flex justify-center items-center mt-10">
+          <ReloadIcon className="h-6 w-6 animate-spin text-gray-500" />
+        </div>
+      )}
+
+      {status === "error" && (
+        <p className="text-red-500 text-center mt-10">
+          Error loading photos. Please try again later.
+        </p>
+      )}
+
+      {status === "success" && allPhotos.length === 0 && (
+        <p className="text-gray-600 text-center mt-10">
+          Could not find any photos. Please try again.
+        </p>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {allPhotos.map((photo: PexelsPhoto) => (
-            <div
+            <PhotoCard
               key={photo.id}
-              className="break-inside-avoid cursor-pointer overflow-hidden rounded shadow hover:scale-105 transition-transform bg-white"
+              photo={photo}
               onClick={() => setSelectedPhotoId(photo.id)}
-            >
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                width={photo.width}
-                height={photo.height}
-                className="w-full h-auto object-cover"
-                unoptimized
-              />
-            </div>
+            />
           ))}
         </div>
 

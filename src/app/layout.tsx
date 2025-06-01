@@ -1,7 +1,5 @@
-//monta el proveedor trpc (cliente)
-
 import "./globals.css";
-import { Providers } from "@/components/providers";
+import { Providers } from "@/providers/providers";
 
 export default function RootLayout({
   children,
