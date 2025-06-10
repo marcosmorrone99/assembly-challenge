@@ -4,7 +4,7 @@ const MAX_RECENT_VIEWS = 10;
 
 // Store the last 10 views in local storage
 const getRecentViews = (): number[] => {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return []; //without this i get the "localStorage is not defined" error
   const recentViews = localStorage.getItem("recentViews");
   return recentViews ? JSON.parse(recentViews) : [];
 };
@@ -12,18 +12,15 @@ const getRecentViews = (): number[] => {
 export const useRecentViews = () => {
   const [recentViews, setRecentViews] = useState<number[]>([]);
 
-  // Initialize from localStorage on mount
   useEffect(() => {
     setRecentViews(getRecentViews());
   }, []);
 
   const addView = (view: number) => {
     setRecentViews((prev) => {
-      // Remove if already exists to avoid duplicates, then add to front
       const filtered = prev.filter((v) => v !== view);
       const newViews = [view, ...filtered].slice(0, MAX_RECENT_VIEWS);
 
-      // Save the NEW views to localStorage (this was the bug!)
       localStorage.setItem("recentViews", JSON.stringify(newViews));
       return newViews;
     });

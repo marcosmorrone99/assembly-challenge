@@ -82,6 +82,7 @@ export default function RecentViewsDropdown({
   );
 }
 
+//I could have created this as a separate component, but i decided to keep it here for now because of time constraints
 type RecentViewItemProps = {
   photoId: number;
   onOpenPhoto: (photoId: number) => void;

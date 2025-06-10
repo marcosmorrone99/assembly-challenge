@@ -31,7 +31,6 @@ export function Gallery() {
 
   const allPhotos = data?.pages.flatMap((page) => page.photos) || [];
 
-  // Function to update URL with search query
   const updateURLWithQuery = (query: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -47,13 +46,11 @@ export function Gallery() {
     router.replace(newURL);
   };
 
-  // Handle search with URL update
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     updateURLWithQuery(query);
   };
 
-  // Handle clear search with URL update
   const handleClearSearch = () => {
     setSearchQuery(null);
     setSearchInput("");
@@ -61,7 +58,6 @@ export function Gallery() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Handle opening photo from recent views
   const handleOpenPhotoFromRecents = (photoId: number) => {
     setSelectedPhotoId(photoId);
   };
