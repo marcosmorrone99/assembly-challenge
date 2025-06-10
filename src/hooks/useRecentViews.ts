@@ -23,7 +23,6 @@ export const useRecentViews = () => {
       const filtered = prev.filter((v) => v !== view);
       const newViews = [view, ...filtered].slice(0, MAX_RECENT_VIEWS);
 
-      // Save the NEW views to localStorage (this was the bug!)
       localStorage.setItem("recentViews", JSON.stringify(newViews));
       return newViews;
     });

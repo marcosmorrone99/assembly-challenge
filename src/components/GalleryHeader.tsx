@@ -28,8 +28,6 @@ const collections = [
   },
 ];
 
-//TODO: add a filter by favorites button to the header
-
 type Props = {
   value: string;
   onChange: (value: string) => void;
