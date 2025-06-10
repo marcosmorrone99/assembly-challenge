@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, Heart } from "lucide-react";
+import { RecentSearches } from "./RecentSearches";
+import RecentViewsDropdown from "./RecentViewsDropdown";
 
 const collections = [
   {
@@ -26,12 +28,23 @@ const collections = [
   },
 ];
 
+//TODO: add a filter by favorites button to the header
+
 type Props = {
   value: string;
   onChange: (value: string) => void;
   onSearch: (query: string) => void;
   onClearSearch?: () => void;
   searchQuery?: string | null;
+  recentSearches: string[];
+  recentViews: number[];
+  onRemoveSearch: (search: string) => void;
+  showFavoritesOnly: boolean;
+  onToggleFavorites: () => void;
+  favoritesCount: number;
+  onOpenPhoto: (photoId: number) => void;
+  onRemoveView: (photoId: number) => void;
+  onClearHistory: () => void;
 };
 
 export function GalleryHeader({
@@ -40,6 +53,15 @@ export function GalleryHeader({
   onSearch,
   onClearSearch,
   searchQuery,
+  recentSearches,
+  recentViews,
+  onRemoveSearch,
+  showFavoritesOnly,
+  onToggleFavorites,
+  favoritesCount,
+  onOpenPhoto,
+  onRemoveView,
+  onClearHistory,
 }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,16 +101,48 @@ export function GalleryHeader({
                   Search
                 </button>
               </div>
+              <RecentSearches
+                recentSearches={recentSearches}
+                onClick={onRemoveSearch}
+              />
             </form>
 
-            {searchQuery && onClearSearch && (
+            <div className="flex items-center gap-4 mb-4">
+              {searchQuery && onClearSearch && (
+                <button
+                  onClick={onClearSearch}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Clear search
+                </button>
+              )}
+
               <button
-                onClick={onClearSearch}
-                className="text-sm text-blue-600 hover:underline"
+                onClick={onToggleFavorites}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                  showFavoritesOnly
+                    ? "bg-red-100 text-red-700 border border-red-200"
+                    : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                }`}
               >
-                Clear search
+                <Heart
+                  className="w-4 h-4"
+                  fill={showFavoritesOnly ? "currentColor" : "none"}
+                />
+                {showFavoritesOnly ? "Show All" : "Favorites"}
+                {favoritesCount > 0 && (
+                  <span className="bg-current text-white rounded-full px-2 py-0.5 text-xs min-w-[1.5rem] text-center">
+                    {favoritesCount}
+                  </span>
+                )}
               </button>
-            )}
+              <RecentViewsDropdown
+                recentViews={recentViews}
+                onOpenPhoto={onOpenPhoto}
+                onRemoveView={onRemoveView}
+                onClearHistory={onClearHistory}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">

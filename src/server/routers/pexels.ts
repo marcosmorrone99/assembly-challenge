@@ -10,6 +10,7 @@ export type PexelsPhoto = {
   url: string;
   src: string;
   alt: string;
+  isFavorite?: boolean;
 };
 
 const API_KEY = process.env.PEXELS_API_KEY;
