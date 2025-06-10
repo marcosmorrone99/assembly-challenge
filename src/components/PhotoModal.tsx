@@ -3,21 +3,31 @@
 import { trpc } from "@/utils/trpc";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useClickOutside } from "@/hooks/useClickOutside";
 
 type Props = {
   photoId: number;
   onClose: () => void;
+  onView: (photoId: number) => void;
+  recentViews: number[];
 };
 
-export function PhotoModal({ photoId, onClose }: Props) {
+export function PhotoModal({ photoId, onClose, onView, recentViews }: Props) {
   const { data: photo, isLoading } = trpc.pexels.getPhotoById.useQuery({
     id: photoId,
   });
   const modalRef = useRef<HTMLDivElement>(null);
-
+  const hasTrackedView = useRef<number | null>(null);
   useClickOutside(modalRef, onClose);
+
+  useEffect(() => {
+    // Only add to recent views once per photoId
+    if (hasTrackedView.current !== photoId) {
+      onView(photoId);
+      hasTrackedView.current = photoId;
+    }
+  }, [photoId, onView]);
 
   if (isLoading || !photo) return null;
 
@@ -40,7 +50,7 @@ export function PhotoModal({ photoId, onClose }: Props) {
           <button
             onClick={onClose}
             className="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl z-10"
-            aria-label="Cerrar"
+            aria-label="Close"
           >
             ✕
           </button>
@@ -64,7 +74,7 @@ export function PhotoModal({ photoId, onClose }: Props) {
                 rel="noopener noreferrer"
                 className="text-sm text-blue-600 underline mt-1 inline-block"
               >
-                Pexels
+                View on Pexels
               </a>
             </div>
           </div>

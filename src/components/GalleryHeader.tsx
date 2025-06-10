@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Search } from "lucide-react";
+import RecentViewsDropdown from "./RecentViewsDropdown";
 
 const collections = [
   {
@@ -32,6 +33,10 @@ type Props = {
   onSearch: (query: string) => void;
   onClearSearch?: () => void;
   searchQuery?: string | null;
+  recentViews: number[];
+  onOpenPhoto: (photoId: number) => void;
+  onRemoveView: (photoId: number) => void;
+  onClearHistory: () => void;
 };
 
 export function GalleryHeader({
@@ -40,6 +45,10 @@ export function GalleryHeader({
   onSearch,
   onClearSearch,
   searchQuery,
+  recentViews,
+  onOpenPhoto,
+  onRemoveView,
+  onClearHistory,
 }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,14 +90,23 @@ export function GalleryHeader({
               </div>
             </form>
 
-            {searchQuery && onClearSearch && (
-              <button
-                onClick={onClearSearch}
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Clear search
-              </button>
-            )}
+            <div className="flex items-center gap-4 mb-4">
+              {searchQuery && onClearSearch && (
+                <button
+                  onClick={onClearSearch}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Clear search
+                </button>
+              )}
+
+              <RecentViewsDropdown
+                recentViews={recentViews}
+                onOpenPhoto={onOpenPhoto}
+                onRemoveView={onRemoveView}
+                onClearHistory={onClearHistory}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
